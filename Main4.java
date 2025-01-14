@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Main4 {
+public class Main {
     public static void main(String[] a) {
         var s = new Scanner(System.in);
         var r = new ArrayList<Map<String, String>>();
