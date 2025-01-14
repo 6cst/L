@@ -1,35 +1,38 @@
 import java.util.*;
 
-public class Main3 {
-    public static void main(String[] a) {
-        var s = new Scanner(System.in);
-        System.out.println("Enter number of productions:");
-        int n = s.nextInt(); s.nextLine();
-        var nts = new ArrayList<String>();
-        var p = new ArrayList<List<String>>();
-        for (int i = 0; i < n; i++) {
-            var t = s.nextLine().split("->");
-            nts.add(t[0]); p.add(List.of(t[1].split("\\|")));
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter number of productions: ");
+        int n = sc.nextInt();
+        sc.nextLine();
+
+        List<String> nonTerminals = new ArrayList<>(), rules = new ArrayList<>();
+        System.out.println("Enter productions (e.g., A->Ab|c):");
+        while (n-- > 0) {
+            String[] parts = sc.nextLine().split("->");
+            nonTerminals.add(parts[0].trim());
+            rules.add(parts[1]);
         }
-        if (n == 1) r(nts.get(0), p.get(0));
-        else i(nts, p);
+
+        for (int i = 0; i < nonTerminals.size(); i++)
+            removeRecursion(nonTerminals.get(i), rules.get(i).split("\\|"));
     }
 
-    static void r(String nt, List<String> ps) {
-        var a = new ArrayList<String>();
-        var b = new ArrayList<String>();
-        ps.forEach(x -> (x.startsWith(nt) ? a : b).add(x));
-        System.out.println(nt + "->" + (a.isEmpty() ? String.join("|", ps) : String.join(nt + "'|", b) + nt + "'"));
-        if (!a.isEmpty()) System.out.println(nt + "'->" + String.join(nt + "'|", a).substring(nt.length()) + "|ε");
-    }
-
-    static void i(List<String> nts, List<List<String>> ps) {
-        System.out.println(nts.get(0) + "->" + String.join("|", ps.get(0)));
-        var np = new ArrayList<String>();
-        ps.get(1).forEach(x -> {
-            if (x.startsWith("S")) ps.get(0).forEach(y -> np.add(y + x.substring(1)));
-            else np.add(x);
-        });
-        r(nts.get(1), np);
+    static void removeRecursion(String nt, String[] prods) {
+        List<String> alpha = new ArrayList<>(), beta = new ArrayList<>();
+        for (String p : prods) {
+            if (p.startsWith(nt)) alpha.add(p.substring(nt.length()));
+            else beta.add(p);
+        }
+        if (alpha.isEmpty()) {
+            System.out.println(nt + "->" + String.join("|", prods));
+        } else {
+            String newNt = nt + "'";
+            beta.replaceAll(b -> b + newNt);
+            alpha.replaceAll(a -> a + newNt);
+            System.out.println(nt + "->" + String.join("|", beta));
+            System.out.println(newNt + "->" + String.join("|", alpha) + "|ε");
+        }
     }
 }
