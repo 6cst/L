@@ -1,0 +1,58 @@
+import java.util.Scanner;
+
+public class ProductionRules {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // Get number of production rules
+        System.out.println("Enter number of production rules:");
+        int n = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+        
+        // Get PR1 and PR2
+        System.out.println("Enter production rules in format (X->Y):");
+        String pr1 = scanner.nextLine();
+        String pr2 = scanner.nextLine();
+        
+        // Split PR1 into LHS and RHS
+        String[] pr1Parts = pr1.split("->");
+        String pr1Lhs = pr1Parts[0].trim();
+        String pr1Rhs = pr1Parts[1].trim();
+        
+        // Split PR2 into LHS and RHS
+        String[] pr2Parts = pr2.split("->");
+        String pr2Lhs = pr2Parts[0].trim();
+        String pr2Rhs = pr2Parts[1].trim();
+        
+        // Print PR1 as is
+        System.out.println("\nFinal Production Rules:");
+        System.out.println(pr1);
+        
+        // Process PR2
+        String[] pr2Productions = pr2Rhs.split("\\|");
+        StringBuilder newPr2Rhs = new StringBuilder();
+        
+        for (int i = 0; i < pr2Productions.length; i++) {
+            String production = pr2Productions[i];
+            if (production.contains(pr1Lhs)) {
+                // Replace pr1Lhs with each part of pr1Rhs
+                String[] pr1RhsParts = pr1Rhs.split("\\|");
+                for (int j = 0; j < pr1RhsParts.length; j++) {
+                    String newProduction = production.replace(pr1Lhs, pr1RhsParts[j]);
+                    newPr2Rhs.append(newProduction);
+                    if (j < pr1RhsParts.length - 1) {
+                        newPr2Rhs.append("|");
+                    }
+                }
+            } else {
+                newPr2Rhs.append(production);
+            }
+            if (i < pr2Productions.length - 1) {
+                newPr2Rhs.append("|");
+            }
+        }
+        
+        // Print modified PR2
+        System.out.println(pr2Lhs + "->" + newPr2Rhs.toString());
+    }
+}
