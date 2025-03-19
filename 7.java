@@ -1,42 +1,89 @@
 import java.util.*;
-
 public class Main{
-
-  static class R{String l;List<String> r;R(String ll,List<String> rr){l=ll;r=rr;} }
-
-  public static void main(String[]a){
-    Scanner s=new Scanner(System.in);
-    int n=Integer.parseInt(s.nextLine().trim());
-    List<R> p=new ArrayList<>();
-    for(int i=0;i<n;i++){
-      String[]t=s.nextLine().split("->");
-      p.add(new R(t[0].trim(),Arrays.asList(t[1].trim().split(" "))));
-    }
-    LinkedList<String> in=new LinkedList<>(Arrays.asList(s.nextLine().split(" "))); in.add("$");
-    Stack<String> st=new Stack<>(); st.push("$");
-    System.out.format("%-24s %-24s %-24s\n","Stack","Input Buffer","Action");
-    while(true){
-      String stRep=(st.size()>1?"$ "+String.join(" ",st.subList(1,st.size()))+" $":"$");
-      String inRep="$ "+String.join(" ",in)+" $";
-      System.out.format("%-24s %-24s ",stRep,inRep);
-      if(st.size()==2 && st.get(1).equals(p.get(0).l) && in.peek().equals("$")){
-        System.out.println("Accept"); break;}
-      boolean rdc=false;
-      for(R pr:p){
-        int sz=pr.r.size();
-        if(st.size()>=sz+1 && st.subList(st.size()-sz,st.size()).equals(pr.r)){
-          for(int j=0;j<sz;j++) st.pop();
-          st.push(pr.l);
-          System.out.println("Reduce "+pr.l+"->"+String.join(" ",pr.r));
-          rdc=true; break;}
-      }
-      if(rdc) continue;
-      if(!in.isEmpty()){
-        String tk=in.poll();
-        if(tk.equals("$")) continue;
-        st.push(tk);
-        System.out.println("Shift");
-      }else{System.out.println("Error");break;}
-    }
+ static class R{
+     String l,r; 
+     R(String l,String r){
+         this.l=l; 
+         this.r=r;
+     }
+ }
+ 
+ public static void main(String[]a){
+  Scanner s=new Scanner(System.in);
+  System.out.print("Enter Number of rules: "); 
+  int n=Integer.parseInt(s.nextLine());
+  List<R> rules=new ArrayList<>(); 
+  System.out.println("Enter Rules (format: LHS->RHS):");
+  for(int i=0;i<n;i++){
+    String[] p=s.nextLine().replaceAll("\\s*->\\s*","->").split("->");
+    if(p.length<2) continue; 
+    rules.add(new R(p[0].trim(),p[1].trim()));
   }
+  
+  System.out.print("Enter Input String (ending with $): ");
+  String input=s.nextLine(); 
+  if(!input.endsWith("$")) 
+  input+="$";
+  String stack="$"; 
+  System.out.println("\n------------------------------------------------------------");
+  System.out.printf("%-20s%-20s%-20s\n","Stack","Input Buffer","Parsing Action");
+  System.out.println("------------------------------------------------------------");
+  String start=rules.get(0).l;
+  
+  while(true){
+    String act="";
+    if(input.equals("$") && stack.equals("$"+start)){
+      act="Accept"; 
+      System.out.printf("%-20s%-20s%-20s\n",stack,input,act);
+      System.out.println("Accepted"); 
+      break;
+    }
+    
+    boolean done=false;
+    for(R r:rules){
+      if(stack.endsWith(r.r)){
+        stack=stack.substring(0,stack.length()-r.r.length())+r.l;
+        act="Reduce by "+r.l+"->"+r.r; 
+        done=true; 
+        break;
+      }
+    }
+    
+    if(!done){
+      if(!input.equals("$") && !input.isEmpty()){
+        char c=input.charAt(0); 
+        input=input.substring(1);
+        stack+=c; 
+        act="Shift "+c; 
+        done=true;
+      } else { act="Parsing Error"; 
+        System.out.printf("%-20s%-20s%-20s\n",stack,input,act); 
+        break; 
+      }
+    }
+    System.out.printf("%-20s%-20s%-20s\n",stack,input,act);
+  }
+  s.close();
+ }
 }
+
+ S –> S + S 
+ S –> S * S 
+ S –> id
+ id + id + id
+
+   Example 2 – Consider the grammar 
+        E –> 2E2 
+        E –> 3E3 
+        E –> 4 
+Perform Shift Reduce parsing for input string “32423”. 
+
+Example 3 – Consider the grammar
+                         S –>  ( L ) | a        
+                         L –>  L , S | S    
+Perform Shift Reduce parsing for input string ( a, ( a, a ) ) 
+  
+
+  
+
+
