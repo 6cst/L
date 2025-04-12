@@ -848,4 +848,53 @@ class Main {
     }
 }
 
+
+import java.util.*;
+public class Main {
+  public static void main(String[] a) {
+    Scanner s = new Scanner(System.in);
+    System.out.print("No. of terminals: ");
+    int n = s.nextInt(); s.nextLine();
+    System.out.print("Terminals: ");
+    String t = s.nextLine();
+    String[][] p = new String[n][n];
+    System.out.println("Precedence Table: ");
+    for (int i = 0; i < n; i++)
+      for (int j = 0; j < n; j++)
+        p[i][j] = s.next();
+    System.out.println("OPERATOR PRECEDENCE TABLE:");
+    System.out.print("\t");
+    for (int i = 0; i < n; i++) System.out.print(t.charAt(i) + "\t");
+    System.out.println();
+    for (int i = 0; i < n; i++) {
+      System.out.print(t.charAt(i) + "\t");
+      for (int j = 0; j < n; j++) System.out.print(p[i][j] + "\t");
+      System.out.println();
+    }
+    System.out.print("String : ");
+    String I = s.next() + "$", A = "$";
+    System.out.println("STACK\t\tINPUT\t\tACTION");
+    try {
+      while (true) {
+        String x = A.charAt(A.length() - 1) + "", w = I.charAt(0) + "";
+        if (x.equals("E")) x = A.charAt(A.length() - 2) + "";
+        int y = t.indexOf(x), z = t.indexOf(w);
+        if (y == -1 || z == -1) { System.out.println("Rejected."); break; }
+        if (p[y][z].equals("A")) { System.out.println("Accepted."); break; }
+        if (p[y][z].equals("<")) {
+          A += w; I = I.substring(1);
+          System.out.println(A + "\t\t" + I + "\t\tSHIFT" + w);
+        } else {
+          A = A.substring(0, A.length() - 1);
+          if (!x.equals("i")) A = A.substring(0, A.length() - 2);
+          A += "E";
+          System.out.println(A + "\t\t" + I + "\t\tREDUCE");
+        }
+      }
+    } catch(Exception e) {
+      System.out.println("parsing error");
+    }
+  }
+}
+
 a*b+c/d-e/f+g*h 
